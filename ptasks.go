@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -15,8 +16,8 @@ var wg sync.WaitGroup
 //}
 
 func main() {
-	wg.Add(3)
-	for i := 0; i < 3; i++ { //creates 10 million threads. this can be altered to put different load on the CPU
+	wg.Add(1000000)
+	for i := 0; i < 1000000; i++ { //creates 10 million threads. this can be altered to put different load on the CPU
 		go calc() //calls thread to calculate the value of pi
 	}
 
@@ -24,13 +25,13 @@ func main() {
 }
 
 func calc() { //function to calculate the value of pi
-	var N = 10000000
+	var N = 100000000
 	var sum float64
 	var term float64
 	var sign = 1.0
 	for k := 0; k < N; k++ {
 		term = float64((1.0) / (float64(2.0)*float64(k) + float64(1.0)))
-		//time.Sleep(10 * time.Millisecond)
+		time.Sleep(2 * time.Millisecond)
 		sum = sum + float64(sign)*term
 		sign = -sign
 	}
