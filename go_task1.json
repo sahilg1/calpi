@@ -3,7 +3,7 @@
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "sahilg1/go_task1:latest",
+      "image": "sahilg1/calpi:latest",
       "network": "BRIDGE",
       "forcePullImage": true
     }
