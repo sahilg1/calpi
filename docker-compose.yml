@@ -1,0 +1,48 @@
+version: "2"
+
+services:
+  zk:
+    image: bobrik/zookeeper
+    network_mode: host
+    environment:
+      ZK_CONFIG: tickTime=2000,initLimit=10,syncLimit=5,maxClientCnxns=128,forceSync=no,clientPort=2181
+      ZK_ID: 1
+
+  master:
+    image: mesosphere/mesos-master:0.27.0-0.2.190.ubuntu1404
+    network_mode: host
+    environment:
+      MESOS_ZK: zk://127.0.0.1:2181/mesos
+      MESOS_QUORUM: 1
+      MESOS_CLUSTER: docker-compose
+      MESOS_REGISTRY: replicated_log # default is in_memory for some reason
+      MESOS_IP: HOSTIP
+      MESOS_HOSTNAME: HOSTIP
+    depends_on:
+      - zk
+
+  slave-one:
+    image: mesosphere/mesos-slave:0.27.0-0.2.190.ubuntu1404
+    network_mode: host
+    pid: host
+    environment:
+      MESOS_MASTER: zk://127.0.0.1:2181/mesos
+      MESOS_CONTAINERIZERS: docker,mesos
+      # MESOS_HOSTNAME: SLAVE_IP_GOES_HERE
+      MESOS_PORT: 5051
+      MESOS_RESOURCES: ports(*):[11000-11999]
+      MESOS_IP: HOSTIP
+      MESOS_HOSTNAME: HOSTIP
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+      - /usr/local/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zk
+
+  marathon:
+    image: mesosphere/marathon:v0.15.1
+    network_mode: host
+    command: --master zk://127.0.0.1:2181/mesos --env_vars_prefix MARATHON_
+    depends_on:
+      - zk

@@ -1,0 +1,14 @@
+{
+  "id": "go-task1",
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "sahilg1/go_task1:latest",
+      "network": "BRIDGE",
+      "forcePullImage": true
+    }
+  },
+  "cpus": 0.1,
+  "mem": 256.0,
+  "instances": 1
+}
