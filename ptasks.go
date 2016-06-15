@@ -24,7 +24,7 @@ func main() {
 }
 
 func calc() { //function to calculate the value of pi
-	var N = 10000
+	var N = 10000000
 	var sum float64
 	var term float64
 	var sign = 1.0
