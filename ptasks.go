@@ -34,15 +34,10 @@ func calc() { //function to calculate the value of pi
 	var term float64
 	var sign = 1.0
 	for k := 0; k < N; k++ {
-		if checkval() {
-			term = float64((1.0) / (float64(2.0)*float64(k) + float64(1.0)))
-			time.Sleep(5 * time.Millisecond)
-			sum = sum + float64(sign)*term
-			sign = -sign
-		} else {
-
-			break
-		}
+		term = float64((1.0) / (float64(2.0)*float64(k) + float64(1.0)))
+		time.Sleep(5 * time.Millisecond)
+		sum = sum + float64(sign)*term
+		sign = -sign
 	}
 	fmt.Println("Pi=", float64(sum*4.0))
 	wg.Done()
