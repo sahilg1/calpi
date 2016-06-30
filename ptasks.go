@@ -11,18 +11,22 @@ import (
 	"os"
 	"os/user"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 var wg sync.WaitGroup
 
 func main() {
-
+	threads := numthreads()
+	putObject()
 	for {
 		if checkval() {
-			threads := numthreads()
-			writeout()
 			for i := 0; i < threads; i++ { //creates 10 million threads. this can be altered to put different load on the CPU
 				wg.Add(1)
 				go calc() //calls thread to calculate the value of pi
@@ -87,6 +91,26 @@ func writeout() {
 	checkerr(e)
 	fmt.Printf("Wrote number of threads for next container")
 
+}
+
+func putObject() {
+	bucket := "sahgupta-cpu-testing"
+	key := "NumThreads.txt"
+	num := numthreads()
+	num = num / 2
+	nthreads := strconv.Itoa(num)
+	svc := s3.New(session.New(&aws.Config{Region: aws.String("us-east-1")}))
+	_, err := svc.PutObject(&s3.PutObjectInput{
+		Body:   strings.NewReader(nthreads),
+		Bucket: &bucket,
+		Key:    &key,
+	})
+	if err != nil {
+		log.Printf("Failed to upload data to %s/%s, %s\n", bucket, key, err)
+		return
+	}
+
+	log.Printf("Successfully created bucket %s and uploaded data with key %s\n", bucket, key)
 }
 
 func checkerr(e error) {
