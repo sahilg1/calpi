@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/user"
 	"strconv"
 	"strings"
 	"sync"
@@ -76,26 +74,10 @@ func numthreads() int {
 	return nthreads
 }
 
-func writeout() {
-	num := numthreads()
-	num = num / 2
-	nthreads := strconv.Itoa(num)
-
-	usr, er1 := user.Current()
-	checkerr(er1)
-	fmt.Println(usr.HomeDir)
-	f, err := os.Create("NumThreads.txt")
-	checkerr(err)
-	defer f.Close()
-	_, e := f.WriteString(nthreads)
-	checkerr(e)
-	fmt.Printf("Wrote number of threads for next container")
-
-}
-
 func putObject() {
 	bucket := "sahgupta-cpu-testing"
 	key := "NumThreads.txt"
+	//gfc := "GrantFullControl"
 	num := numthreads()
 	num = num / 2
 	nthreads := strconv.Itoa(num)
@@ -104,13 +86,14 @@ func putObject() {
 		Body:   strings.NewReader(nthreads),
 		Bucket: &bucket,
 		Key:    &key,
+		//GrantFullControl: &gfc,
 	})
 	if err != nil {
 		log.Printf("Failed to upload data to %s/%s, %s\n", bucket, key, err)
 		return
 	}
 
-	log.Printf("Successfully created bucket %s and uploaded data with key %s\n", bucket, key)
+	log.Printf("Successfully uploaded data with key %s to bucket %s\n", key, bucket)
 }
 
 func checkerr(e error) {
