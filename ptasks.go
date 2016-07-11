@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -75,13 +77,17 @@ func numthreads() int {
 }
 
 func putObject() {
+	akid := os.Getenv("AKID")
+	secretkey := os.Getenv("SECRET_KEY")
+	token := os.Getenv("TOKEN")
 	bucket := "sahgupta-cpu-testing"
 	key := "NumThreads.txt"
 	//gfc := "GrantFullControl"
 	num := numthreads()
 	num = num / 2
 	nthreads := strconv.Itoa(num)
-	svc := s3.New(session.New(&aws.Config{Region: aws.String("us-east-1")}))
+	svc := s3.New(session.New(&aws.Config{Region: aws.String("us-east-1"),
+		Credentials: credentials.NewStaticCredentials(akid, secretkey, token)}))
 	_, err := svc.PutObject(&s3.PutObjectInput{
 		Body:   strings.NewReader(nthreads),
 		Bucket: &bucket,
